@@ -5,5 +5,7 @@ class ImageConstant {
 
   static String imgEye = 'assets/images/img_eye.svg';
 
+  static String img1 = 'assets/images/img1.png';
+
   static String imageNotFound = 'assets/images/image_not_found.png';
 }

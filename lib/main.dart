@@ -4,13 +4,15 @@ import 'package:flutter/services.dart';
 
 import 'core/app_export.dart';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
-  ]).then((value) {
-    Logger.init(kReleaseMode ? LogMode.live : LogMode.debug);
-    runApp(MyApp());
+  ]).then((value){
+  Logger.init(kReleaseMode ? LogMode.live : LogMode.debug);
+  runApp(MyApp());
   });
 }
 
