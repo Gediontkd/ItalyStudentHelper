@@ -1,5 +1,5 @@
 
-# michele_s_application8
+# CookingLab
 
 <div>
   <h1 align="center">Getting Started with Flutter 🚀 </h1>
