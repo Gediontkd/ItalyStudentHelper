@@ -148,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   if (!isRecording || showStartRecordingButton)
                     CustomButton(
-                      text: "inizia a registrare",
+                      text: "Inizia a Registrare",
                       margin: EdgeInsets.fromLTRB(50, 30, 50, 10),
                       variant: ButtonVariant.OutlineBlack9003f,
                       padding: ButtonPadding.PaddingAll9,
@@ -311,10 +311,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<String> loginAndGetToken() async {
     var url = Uri.parse('https://192.168.60.230:5050/auth/login');
-    var data = {
-      'username': dotenv.env['USERNAME'],
-      'password': dotenv.env['PASSWORD'],
-    };
+    var data = {'username': 'admin', 'password': 'Pwdadmin1!'};
 
     var body = data.keys.map((key) => "${Uri.encodeComponent(key)}=${Uri.encodeComponent(data[key] ?? '')}").join("&");
 

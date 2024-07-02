@@ -32,6 +32,9 @@ flutter:
     - assets/images/img3.png
     - assets/images/img_image1.png
     - assets/images/foto-CookingLab.jpeg
+    - assets/images/lab1.jpg
+    - assets/images/lab2.jpg
+    - assets/images/lab3.jpg
   fonts: 
     - family: Roboto
       fonts: 
