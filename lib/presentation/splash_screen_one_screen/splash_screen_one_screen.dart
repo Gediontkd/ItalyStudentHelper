@@ -58,6 +58,7 @@ class _SplashScreenOneScreenState extends State<SplashScreenOneScreen> with Auto
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       body: Stack(
         children: [

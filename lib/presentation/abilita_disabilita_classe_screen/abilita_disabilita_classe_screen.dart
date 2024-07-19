@@ -103,7 +103,7 @@ class AbilitaDisabilitaClasseScreen
                                                                 textAlign:
                                                                 TextAlign
                                                                     .right,
-                                                                style: AppStyle
+                                                                 style: AppStyle
                                                                     .txtRobotoRomanSemiBold19Lime600))
                                                       ]))
                                             ])),

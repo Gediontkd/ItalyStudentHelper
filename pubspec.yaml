@@ -35,6 +35,7 @@ flutter:
     - assets/images/lab1.jpg
     - assets/images/lab2.jpg
     - assets/images/lab3.jpg
+    - .env
   fonts: 
     - family: Roboto
       fonts: 

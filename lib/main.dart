@@ -3,11 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'core/app_export.dart';
-
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+import 'presentation/login_screen/models/app_strings.dart';
+
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]).then((value){

@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:michele_s_application8/presentation/camera_page/camera_page.dart';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -33,12 +34,69 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Timer? _recordingTimer;
 
+  List<String> _defaultTimes = [];
+  String mainTitle = '';
+  String selectDuration = '';
+  String enterCustomDuration = '';
+  String insertTitle = '';
+  String insertPresenterName = '';
+  String startRecording = '';
+  String recordingDetails = '';
+  String goToCamera = '';
+
   @override
   void initState() {
     super.initState();
     String deviceLanguage = ui.window.locale.languageCode;
     String language = (deviceLanguage == 'en') ? 'EN' : (deviceLanguage == 'it') ? 'IT' : 'IT';
     _languageController = TextEditingController(text: language);
+    fetchStringsFromServer();
+  }
+
+  Future<void> fetchStringsFromServer() async {
+    try {
+      String token = await loginAndGetToken();  // Get the token first
+      HttpClient httpClient = new HttpClient()
+        ..badCertificateCallback =
+        ((X509Certificate cert, String host, int port) => true);
+
+      var request = await httpClient.getUrl(Uri.parse(dotenv.env['SERVER_URL']! + '/get-strings'))
+        ..headers.add('Authorization', 'Bearer $token');
+      var response = await request.close();
+      var responseBody = await response.transform(utf8.decoder).join();
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(responseBody);
+        setState(() {
+          _defaultTimes = List<String>.from(data['durations']);
+          selectDuration = data['select_duration'];
+          enterCustomDuration = data['enter_custom_duration'];
+          insertTitle = data['insert_title'];
+          insertPresenterName = data['insert_presenter_name'];
+          startRecording = data['start_recording'];
+          recordingDetails = data['recording_details'];
+          goToCamera = data['go_to_camera'];
+          mainTitle = data['main_title'];
+        });
+      } else {
+        print('Failed to load strings with status code: ${response.statusCode}');
+        throw Exception('Failed to load strings');
+      }
+    } catch (e) {
+      print('Error fetching strings: $e'); // Debug: Print error message
+      setState(() {
+        isError = true;
+        _defaultTimes = ["00:05:00", "01:00:00", "01:30:00", "02:00:00"];
+        mainTitle = 'CookingLab';
+        selectDuration = 'seleziona Durata';
+        enterCustomDuration = 'Oppure inserisci una durata personalizzata';
+        insertTitle = 'Inserisci il titolo';
+        insertPresenterName = 'Inserisci il nome del relatore';
+        startRecording = 'Inizia a Registrare';
+        recordingDetails = 'Dettagli di registrazione';
+        goToCamera = 'Vai a Fotocamera';
+      });
+    }
   }
 
   @override
@@ -68,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   if (!isRecording || showStartRecordingButton)
                   Text(
-                    'CookingLab',
+                    mainTitle,
                     style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                   ),
                   if (!isRecording || showStartRecordingButton)
@@ -80,6 +138,32 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            DropdownButtonFormField<String>(
+                              value: null,
+                              hint: Text(selectDuration),
+                              icon: Icon(Icons.timer),
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                              ),
+                              items: _defaultTimes.map((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                              onChanged: (newValue) {
+                                setState(() {
+                                  _timeController1.text = newValue!;
+                                });
+                              },
+                              validator: (value) {
+                                if (_timeController1.text.isEmpty || !isTime(_timeController1.text)) {
+                                  return "Inserisci un'ora valida (HH:MM:SS)";
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(height: 12),
                             GestureDetector(
                               onTap: () async {
                                 await showDialog(
@@ -93,7 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           onTimerDurationChanged: (Duration duration) {
                                             _timeController1.text = "${duration.inHours.toString().padLeft(2, '0')}:${duration.inMinutes.remainder(60).toString().padLeft(2, '0')}:${duration.inSeconds.remainder(60).toString().padLeft(2, '0')}";
                                           },
-                                          initialTimerDuration: Duration(hours: DateTime.now().hour, minutes: DateTime.now().minute, seconds: DateTime.now().second),
+                                          initialTimerDuration: Duration(hours: 0, minutes: 0, seconds: 0),
                                         ),
                                       ),
                                     );
@@ -104,7 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: CustomTextFormField(
                                   controller: _timeController1,
                                   prefixIcon: Icon(Icons.timer),
-                                  hintText: "Inserisci la durata",
+                                  hintText: enterCustomDuration,
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(),
                                   ),
@@ -121,7 +205,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             CustomTextFormField(
                               controller: _titleController,
                               prefixIcon: Icon(Icons.title),
-                              hintText: "Inserisci il titolo",
+                              hintText: insertTitle,
                               margin: EdgeInsets.fromLTRB(5, 12, 10, 0),
                               validator: (value) {
                                 if (value != null && !isText(value)) {
@@ -133,7 +217,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             CustomTextFormField(
                               controller: _presenterNameController,
                               prefixIcon: Icon(Icons.person),
-                              hintText: "Inserisci il nome del relatore",
+                              hintText: insertPresenterName,
                               margin: EdgeInsets.fromLTRB(5, 12, 10, 0),
                               validator: (value) {
                                 if (value != null && !isText(value)) {
@@ -148,7 +232,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   if (!isRecording || showStartRecordingButton)
                     CustomButton(
-                      text: "Inizia a Registrare",
+                      text: startRecording,
                       margin: EdgeInsets.fromLTRB(50, 30, 50, 10),
                       variant: ButtonVariant.OutlineBlack9003f,
                       padding: ButtonPadding.PaddingAll9,
@@ -224,7 +308,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: Column(
                                 children: [
                                   Text(
-                                    'Dettagli di registrazione',
+                                    recordingDetails,
                                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
                                   ),
                                   SizedBox(height: 10),
@@ -284,7 +368,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: isLoading
                   ? SizedBox() // Hide the button when isLoading is true
                   : CustomButton(
-                text: "Vai a Fotocamera",
+                text: goToCamera,
                 // prefixIcon: Icon(Icons.camera_alt),
                 margin: EdgeInsets.symmetric(horizontal: 50, vertical: 30),
                 variant: ButtonVariant.OutlineBlack9003f,
@@ -310,8 +394,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<String> loginAndGetToken() async {
-    var url = Uri.parse('https://192.168.60.230:5050/auth/login');
-    var data = {'username': 'admin', 'password': 'Pwdadmin1!'};
+    var url = Uri.parse(dotenv.env['SERVER_URL']! + '/auth/login');
+    var data = {
+      'username': dotenv.env['USERNAME']!,
+      'password': dotenv.env['PASSWORD']!,
+    };
 
     var body = data.keys.map((key) => "${Uri.encodeComponent(key)}=${Uri.encodeComponent(data[key] ?? '')}").join("&");
 
@@ -337,7 +424,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
 
   Future<void> sendPostRequestStart(String token, Map<String, dynamic> data, String time, String camNumber) async {
-    var url = Uri.parse('https://192.168.60.230:5050/start-recording');
+    var url = Uri.parse(dotenv.env['SERVER_URL']! + '/start-recording');
     List<String> timeParts = time.split(':');
     int durationInSeconds = int.parse(timeParts[0]) * 3600 + int.parse(timeParts[1]) * 60 + int.parse(timeParts[2]);
     durationInSeconds += 10;
@@ -385,7 +472,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
 
   Future<void> sendPostRequestStop(String token, String camNumber) async {
-    var url = Uri.parse('https://192.168.60.230:5050/stop-recording');
+    var url = Uri.parse(dotenv.env['SERVER_URL']! + '/stop-recording');
 
     var requestData = {
       "camera_name": int.parse(camNumber),

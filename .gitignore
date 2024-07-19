@@ -6,4 +6,5 @@
 !/.packages
 !/.flutter-plugins-dependencies
 !/.flutter-plugins
-.env
+#uncomment the following line if you want to keep your .env file
+#*.env

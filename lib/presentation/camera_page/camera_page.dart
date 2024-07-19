@@ -3,10 +3,11 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/io_client.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class CameraPage extends StatelessWidget {
-  final String loginUrl = 'https://192.168.60.230:5050/auth/login';
-  final String moveCameraUrl = 'https://192.168.60.230:5050/move-camera';
+  final String loginUrl = dotenv.env['SERVER_URL']! + '/auth/login';
+  final String moveCameraUrl = dotenv.env['SERVER_URL']! + '/move-camera';
 
   Future<http.Client> createHttpClient() async {
     final ioc = HttpClient()
@@ -17,7 +18,10 @@ class CameraPage extends StatelessWidget {
 
   Future<String> loginAndGetToken(http.Client client) async {
     var url = Uri.parse(loginUrl);
-    var data = {'username': 'admin', 'password': 'Pwdadmin1!'};
+    var data = {
+      'username': dotenv.env['USERNAME']!,
+      'password': dotenv.env['PASSWORD']!,
+    };
 
     var body = data.keys
         .map((key) =>
@@ -75,167 +79,152 @@ class CameraPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       body: OrientationBuilder(
-        builder: (context, orientation) => Stack(
-          children: [
-            Column(
-              children: [
-                Expanded(
-                  child: Builder(
-                    builder: (context) => GestureDetector(
+        builder: (context, orientation) {
+          return Stack(
+            children: [
+              Column(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
                       onTap: () async {
                         final client = await createHttpClient();
                         String token = await loginAndGetToken(client);
                         await sendPostRequestMoveCamera(context, token, {
-                          "baseUrl": "HTTP://10.1.1.66:2000",
-                          "username": "admin",
-                          "password": "Adminadmin1",
+                          "baseUrl": dotenv.env['IP_CAMERA_BASE_URL']!,
+                          "username": dotenv.env['IP_CAMERA_USERNAME']!,
+                          "password": dotenv.env['IP_CAMERA_PASSWORD']!,
                           "preset": 1
                         });
                       },
-                      child: Stack(
-                        children: [
-                          Container(
-                            color: Colors.transparent,
-                            child: Transform.rotate(
-                              angle: 3.14 / 2,
-                              child: Image.asset(
-                                'assets/images/img1.png',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
+                      child: Container(
+                        color: Colors.transparent,
+                        child: Transform.rotate(
+                          angle: 3.14 / 2,
+                          child: Image.asset(
+                            'assets/images/img1.png',
+                            fit: BoxFit.cover,
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Builder(
-                    builder: (context) => GestureDetector(
+                  Expanded(
+                    child: GestureDetector(
                       onTap: () async {
                         final client = await createHttpClient();
                         String token = await loginAndGetToken(client);
                         await sendPostRequestMoveCamera(context, token, {
-                          "baseUrl": "HTTP://10.1.1.66:2000",
-                          "username": "admin",
-                          "password": "Adminadmin1",
+                          "baseUrl": dotenv.env['IP_CAMERA_BASE_URL']!,
+                          "username": dotenv.env['IP_CAMERA_USERNAME']!,
+                          "password": dotenv.env['IP_CAMERA_PASSWORD']!,
                           "preset": 3
                         });
                       },
-                      child: Stack(
-                        children: [
-                          Container(
-                            color: Colors.transparent,
-                            child: Transform.rotate(
-                              angle: 3.14 / 2,
-                              child: Image.asset(
-                                'assets/images/img2.png',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
+                      child: Container(
+                        color: Colors.transparent,
+                        child: Transform.rotate(
+                          angle: 3.14 / 2,
+                          child: Image.asset(
+                            'assets/images/img2.png',
+                            fit: BoxFit.cover,
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Builder(
-                    builder: (context) => GestureDetector(
+                  Expanded(
+                    child: GestureDetector(
                       onTap: () async {
                         final client = await createHttpClient();
                         String token = await loginAndGetToken(client);
                         await sendPostRequestMoveCamera(context, token, {
-                          "baseUrl": "HTTP://10.1.1.66:2000",
-                          "username": "admin",
-                          "password": "Adminadmin1",
+                          "baseUrl": dotenv.env['IP_CAMERA_BASE_URL']!,
+                          "username": dotenv.env['IP_CAMERA_USERNAME']!,
+                          "password": dotenv.env['IP_CAMERA_PASSWORD']!,
                           "preset": 2
                         });
                       },
-                      child: Stack(
-                        children: [
-                          Container(
-                            color: Colors.transparent,
-                            child: Transform.rotate(
-                              angle: 3.14 / 2,
-                              child: Image.asset(
-                                'assets/images/img3.png',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
+                      child: Container(
+                        color: Colors.transparent,
+                        child: Transform.rotate(
+                          angle: 3.14 / 2,
+                          child: Image.asset(
+                            'assets/images/img3.png',
+                            fit: BoxFit.cover,
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            Positioned(
-              top: 110.0,
-              right: 350.0,
-              child: GestureDetector(
-                onTap: () async {
-                  final client = await createHttpClient();
-                  String token = await loginAndGetToken(client);
-                  await sendPostRequestMoveCamera(context, token, {
-                    "baseUrl": "HTTP://10.1.1.66:2000",
-                    "username": "admin",
-                    "password": "Adminadmin1",
-                    "preset": 5
-                  });
-                },
-                child: Transform.rotate(
-                  angle: 3.14 / 2, // Rotating 90 degrees (PI / 2 radians)
-                  child: FaceSymbol(),
+                ],
+              ),
+              Positioned(
+                top: screenHeight * 0.15,
+                left: screenWidth * 0.05,
+                child: GestureDetector(
+                  onTap: () async {
+                    final client = await createHttpClient();
+                    String token = await loginAndGetToken(client);
+                    await sendPostRequestMoveCamera(context, token, {
+                      "baseUrl": dotenv.env['IP_CAMERA_BASE_URL']!,
+                      "username": dotenv.env['IP_CAMERA_USERNAME']!,
+                      "password": dotenv.env['IP_CAMERA_PASSWORD']!,
+                      "preset": 5
+                    });
+                  },
+                  child: Transform.rotate(
+                    angle: 3.14 / 2, // Rotating 90 degrees (PI / 2 radians)
+                    child: FaceSymbol(),
+                  ),
                 ),
               ),
-            ),
-            Positioned(
-              top: 350.0,
-              right: 350.0,
-              child: GestureDetector(
-                onTap: () async {
-                  final client = await createHttpClient();
-                  String token = await loginAndGetToken(client);
-                  await sendPostRequestMoveCamera(context, token, {
-                    "baseUrl": "HTTP://10.1.1.66:2000",
-                    "username": "admin",
-                    "password": "Adminadmin1",
-                    "preset": 4
-                  });
-                },
-                child: Transform.rotate(
-                  angle: 3.14 / 2, // Rotating 90 degrees (PI / 2 radians)
-                  child: FaceSymbol(),
+              Positioned(
+                top: screenHeight * 0.35,
+                left: screenWidth * 0.05,
+                child: GestureDetector(
+                  onTap: () async {
+                    final client = await createHttpClient();
+                    String token = await loginAndGetToken(client);
+                    await sendPostRequestMoveCamera(context, token, {
+                      "baseUrl": dotenv.env['IP_CAMERA_BASE_URL']!,
+                      "username": dotenv.env['IP_CAMERA_USERNAME']!,
+                      "password": dotenv.env['IP_CAMERA_PASSWORD']!,
+                      "preset": 4
+                    });
+                  },
+                  child: Transform.rotate(
+                    angle: 3.14 / 2, // Rotating 90 degrees (PI / 2 radians)
+                    child: FaceSymbol(),
+                  ),
                 ),
               ),
-            ),
-            Positioned(
-              top: 700.0,
-              right: 350.0,
-              child: GestureDetector(
-                onTap: () async {
-                  final client = await createHttpClient();
-                  String token = await loginAndGetToken(client);
-                  await sendPostRequestMoveCamera(context, token, {
-                    "baseUrl": "HTTP://10.1.1.66:2000",
-                    "username": "admin",
-                    "password": "Adminadmin1",
-                    "preset": 6
-                  });
-                },
-                child: Transform.rotate(
-                  angle: 3.14 / 2, // Rotating 90 degrees (PI / 2 radians)
-                  child: FaceSymbol(),
+              Positioned(
+                top: screenHeight * 0.7,
+                left: screenWidth * 0.05,
+                child: GestureDetector(
+                  onTap: () async {
+                    final client = await createHttpClient();
+                    String token = await loginAndGetToken(client);
+                    await sendPostRequestMoveCamera(context, token, {
+                      "baseUrl": dotenv.env['IP_CAMERA_BASE_URL']!,
+                      "username": dotenv.env['IP_CAMERA_USERNAME']!,
+                      "password": dotenv.env['IP_CAMERA_PASSWORD']!,
+                      "preset": 6
+                    });
+                  },
+                  child: Transform.rotate(
+                    angle: 3.14 / 2, // Rotating 90 degrees (PI / 2 radians)
+                    child: FaceSymbol(),
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          );
+        },
       ),
     );
   }
