@@ -14,14 +14,14 @@ class _SplashScreenOneScreenState extends State<SplashScreenOneScreen> with Auto
   Timer? _timer;
   double currentPage = 0;
 
-  // Add your image paths here
+  // image paths
   final List<String> imagePaths = [
     'assets/images/lab1.jpg',
     'assets/images/lab2.jpg',
     'assets/images/lab3.jpg',
   ];
 
-  // Add your text here
+  // text
   final List<String> imageTexts = [
     'Text 1',
     'CookingLab',
