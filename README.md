@@ -1,5 +1,5 @@
 
-# CookingLab
+# ItalyStudentHelper
 
 <div>
   <h1 align="center">Getting Started with Flutter 🚀 </h1>
